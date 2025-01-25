@@ -13,6 +13,7 @@
     "@libsql/client": "^0.14.0",
     "nuxt": "^3.15.3",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "zod": "^3.24.1"
   }
 }

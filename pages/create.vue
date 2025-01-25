@@ -1,8 +1,34 @@
+<script setup>
+function handleSubmit(event) {
+  const form = event.target;
+  const formData = new FormData(form);
+  console.log("form data", formData);
+
+  fetch("api/games", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+
+      throw new Error("Network response was not ok.");
+    })
+    .then((data) => {
+      form.reset();
+    })
+    .catch((error) => {
+      console.error("There was a problem with your fetch operation:", error);
+    });
+}
+</script>
+
 <template>
   <main>
     <Header>Create game</Header>
 
-    <form>
+    <form @submit.prevent="handleSubmit">
       <label for="name">Name</label>
       <input type="text" id="name" name="name" />
 
@@ -22,12 +48,20 @@
         </div>
       </div>
 
-      <button>Create</button>
+      <input type="submit" value="Create" />
     </form>
   </main>
 </template>
 
 <style>
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
 form {
   display: flex;
   flex-direction: column;
