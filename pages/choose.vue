@@ -4,7 +4,7 @@
 
     <div class="choose-buttons">
       <LinkButton href="create">Create a game</LinkButton>
-      <LinkButton href="join">Join</LinkButton>
+      <LinkButton href="game">Join</LinkButton>
     </div>
   </main>
 </template>

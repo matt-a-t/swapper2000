@@ -1,26 +1,21 @@
 <script setup>
-function handleSubmit(event) {
+async function handleSubmit(event) {
   const form = event.target;
   const formData = new FormData(form);
-  console.log("form data", formData);
 
-  fetch("api/games", {
+  const response = await $fetch("api/games", {
     method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
+    body: {
+      prompt: formData.get("prompt"),
+      numPlayers: formData.get("numPlayers"),
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Network response was not ok.");
+  }
+  console.log("Game created!");
 
-      throw new Error("Network response was not ok.");
-    })
-    .then((data) => {
-      form.reset();
-    })
-    .catch((error) => {
-      console.error("There was a problem with your fetch operation:", error);
-    });
+  navigateTo(`game?code=${response.code}`);
 }
 </script>
 
@@ -29,24 +24,11 @@ function handleSubmit(event) {
     <Header>Create game</Header>
 
     <form @submit.prevent="handleSubmit">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" />
-
-      <label for="prompt">Anything to say?</label>
+      <label for="prompt">Theme?</label>
       <textarea id="prompt" name="prompt"></textarea>
 
-      <div>
-        <label for="type">Album, song, or artist?</label>
-
-        <div class="radio-group">
-          <input type="radio" id="type" name="type" value="album" checked />
-          <label for="type">Album</label>
-          <input type="radio" id="type" name="type" value="song" />
-          <label for="type">Song</label>
-          <input type="radio" id="type" name="type" value="artist" />
-          <label for="type">Artist</label>
-        </div>
-      </div>
+      <label for="numPlayers">Number of players?</label>
+      <input id="numPlayers" name="numPlayers" type="number" />
 
       <input type="submit" value="Create" />
     </form>
