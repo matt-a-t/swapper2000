@@ -1,6 +1,6 @@
 <script setup>
-const router = useRouter();
 const props = defineProps(["game", "player", "entry"]);
+const config = useRuntimeConfig();
 const { game, player, entry } = toRefs(props);
 const swap = useState("swap");
 
@@ -16,7 +16,7 @@ async function advanceGame() {
     throw new Error("Network response was not ok.");
   }
 
-  router.push("/game?code=" + game.value.code + "&name=" + player.value.name);
+  navigateTo("/game?code=" + game.value.code + "&name=" + player.value.name);
 }
 
 async function getSwap() {
@@ -37,8 +37,6 @@ async function getSwap() {
   }
 }
 
-console.log(game.value);
-
 if (game.value.entries_done) {
   getSwap();
 }
@@ -49,6 +47,9 @@ if (game.value.entries_done) {
   <div class="box">
     <h2>The theme:</h2>
     <p>{{ game.prompt }}</p>
+
+    <h3>Link to game</h3>
+    <p>{{ `${config.public.url}/game?code=${game.code}` }}</p>
   </div>
   <div class="box" v-if="swap">
     <h2>Your swap:</h2>

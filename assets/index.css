@@ -14,7 +14,6 @@ main {
 .box {
   display: flex;
   flex-direction: column;
-  gap: 1em;
   background: #f89513;
   padding: 1em;
   border: 10px solid #333331;
