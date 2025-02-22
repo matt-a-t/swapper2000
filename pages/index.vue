@@ -7,7 +7,7 @@
 </template>
 
 <style>
-main {
+/* main {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,7 +16,7 @@ main {
   @media (max-width: 600px) {
     gap: 4em;
   }
-}
+} */
 
 main img {
   height: 60%;

@@ -6,11 +6,11 @@ async function handleSubmit(event) {
   const form = event.target;
   const formData = new FormData(form);
 
-  const response = await $fetch("api/swap", {
+  const response = await $fetch("api/entry", {
     method: "POST",
     body: {
-      playerId: player.id,
-      gameCode: game.code,
+      playerId: props.player.id,
+      gameCode: props.game.code,
       albumName: formData.get("album-name"),
       artistName: formData.get("artist-name"),
       songName: formData.get("song-name"),
@@ -29,12 +29,24 @@ async function handleSubmit(event) {
 
 <template>
   <Header>Make your pick</Header>
+  <div class="box">
+    <h2>The theme:</h2>
+    <p>{{ game.prompt }}</p>
+  </div>
   <form @submit.prevent="handleSubmit">
     <label for="album-name">Album name</label>
     <input id="album-name" name="album-name" type="text" />
+
+    <label for="artist-name">Artist name</label>
     <input id="artist-name" name="artist-name" type="text" />
+
+    <label for="song-name">Song name</label>
     <input id="song-name" name="song-name" type="text" />
+
+    <label for="link">Link</label>
     <input id="link" name="link" type="text" />
+
+    <label for="comment">Comment</label>
     <input id="comment" name="comment" type="text" />
 
     <input type="submit" value="SWAP!" />

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const gameSchema = z.object({
   prompt: z.string(),
-  numPlayers: z.string(),
+  name: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -34,23 +34,26 @@ export default defineEventHandler(async (event) => {
   }
   const code = await generateCode();
 
-  const { prompt } = result.data;
+  const { prompt, name } = result.data;
 
-  const sql = 'insert into Games (code, prompt, finished) values (?, ?, 0)';
-  const args = [code, prompt];
+  const sql = `
+    insert into Games 
+    (code, prompt, creator, entries_done, ratings_done)
+    values (?, ?, ?, 0, 0)`;
+  const args = [code, prompt, name];
 
   await client.execute({ sql, args });
 
-  // insert blank players
-  for (let i = 0; i < parseInt(result.data.numPlayers); i++) {
-    await client.execute({
-      sql: 'insert into Players (game_code, name) values (?, ?)',
-      args: [code, ''],
-    });
-  }
+  const playerSql = `
+    insert into Players
+    (game_code, name)
+    values (?, ?)`;
+  const playerArgs = [code, name];
+  await client.execute({ sql: playerSql, args: playerArgs });
 
   return {
     ok: true,
     code,
+    name,
   };
 });

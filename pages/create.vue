@@ -7,7 +7,7 @@ async function handleSubmit(event) {
     method: "POST",
     body: {
       prompt: formData.get("prompt"),
-      numPlayers: formData.get("numPlayers"),
+      name: formData.get("name"),
     },
   });
   if (!response.ok) {
@@ -15,7 +15,7 @@ async function handleSubmit(event) {
   }
   console.log("Game created!");
 
-  navigateTo(`game?code=${response.code}`);
+  navigateTo(`game?code=${response.code}&name=${response.name}`);
 }
 </script>
 
@@ -27,8 +27,8 @@ async function handleSubmit(event) {
       <label for="prompt">Theme?</label>
       <textarea id="prompt" name="prompt"></textarea>
 
-      <label for="numPlayers">Number of players?</label>
-      <input id="numPlayers" name="numPlayers" type="number" />
+      <label for="name">Your name?</label>
+      <input id="name" name="name" type="text" />
 
       <input type="submit" value="Create" />
     </form>
@@ -36,13 +36,13 @@ async function handleSubmit(event) {
 </template>
 
 <style>
-main {
+/* main {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-}
+} */
 
 form {
   display: flex;

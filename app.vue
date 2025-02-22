@@ -11,10 +11,6 @@
   </div>
 </template>
 
-<script>
-import "~/assets/baseline.css";
-</script>
-
 <style>
 .gradient-layer {
   height: 100vh;

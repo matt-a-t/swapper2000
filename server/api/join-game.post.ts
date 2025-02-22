@@ -20,12 +20,12 @@ export default defineEventHandler(async (event) => {
   const { code, name } = result.data;
 
   const client = useTurso();
-  const check = await client.execute({
-    sql: 'select * from Games where code = $1',
+  const gameQuery = await client.execute({
+    sql: 'select * from Games where code = ?',
     args: [code],
   });
 
-  if (check.rows.length === 0) {
+  if (gameQuery.rows.length === 0) {
     return {
       status: 404,
       data: {
@@ -35,44 +35,27 @@ export default defineEventHandler(async (event) => {
   }
 
   const gamePlayerResults = await client.execute({
-    sql: 'select * from Players where game = $1',
-    args: [code, name],
+    sql: 'select * from Players where game_code = ?',
+    args: [code],
   });
   const gamePlayers = gamePlayerResults.rows;
+  console.log('gamePlayers', gamePlayers);
 
   if (gamePlayers.find(player => player.name === name)) {
     return {
       status: 409,
-      data: {
-        error: 'Name already taken',
-      },
+      player: gamePlayers.find(player => player.name === name),
+      message: 'Name already taken',
     };
   }
 
-  const firstBlankPlayer = gamePlayers.find(player => !player.name);
-  if (firstBlankPlayer) {
-    await client.execute({
-      sql: 'update Players set name = $1 where id = $2',
-      args: [name, firstBlankPlayer.id],
-    });
+  const player = await client.execute({
+    sql: 'insert into Players (game_code, name) values (?, ?) returning *',
+    args: [code, name],
+  });
 
-    return {
-      status: 200,
-      data: {
-        ok: true,
-      },
-    };
-  } else {
-    await client.execute({
-      sql: 'insert into Players (game_code, name) values ($1, $2)',
-      args: [code, name],
-    });
-
-    return {
-      status: 200,
-      data: {
-        ok: true,
-      },
-    };
-  }
+  return {
+    ok: true,
+    player: player.rows[0],
+  };
 });
