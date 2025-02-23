@@ -7,8 +7,6 @@ const name = ref(route.query.name);
 const player = useState("player");
 const entry = useState("entry");
 
-// http://localhost:3000/game?code=c6ej
-// &name=matt%20c
 // if we get the code from the URL, fetch the game
 if (gameCode.value) {
   await fetchGame();
@@ -35,7 +33,6 @@ async function fetchGame() {
 }
 
 async function fetchEntry() {
-  console.log("fetching entry", player.value.id);
   const response = await $fetch(`${config.public.url}/api/entry`, {
     method: "GET",
     query: {
@@ -95,10 +92,10 @@ async function joinGame() {
 function setEntry(entry) {
   fetchEntry();
   entry.value = entry;
+  fetchGame();
 }
 
 async function setPlayer(newPlayer) {
-  console.log("setting player", newPlayer);
   player.value = newPlayer;
   await nextTick();
   fetchEntry();

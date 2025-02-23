@@ -5,7 +5,7 @@ const props = defineProps(["href"]);
   <a v-bind:href="props.href"><slot /></a>
 </template>
 
-<style>
+<style scoped>
 a {
   background: #f89513;
   font-size: 2em;

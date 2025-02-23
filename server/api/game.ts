@@ -28,9 +28,18 @@ export default defineEventHandler(async (event) => {
       },
     };
   }
+  const game = rows[0];
+
+  const playersQuery = await client.execute({
+    sql: 'select * from Players where game_code = ?',
+    args: [game.code],
+  });
 
   return {
     ok: true,
-    game: rows[0],
+    game: {
+      ...game,
+      players: playersQuery.rows,
+    },
   };
 });

@@ -20,6 +20,24 @@ main {
   border-radius: 30px;
 }
 
+.row {
+  display: flex;
+  gap: 1em;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  align-items: center;
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -28,6 +46,11 @@ form {
   padding: 1em;
   border: 10px solid #333331;
   border-radius: 30px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
 }
 
 label {
@@ -48,9 +71,10 @@ textarea {
 button {
   background: #333331;
   color: #f89513;
-  font-size: 2em;
+  font-size: 1.5em;
   padding: 0.5em;
   border: 10px solid #f89513;
   border-radius: 30px;
   margin: 0;
+  cursor: pointer;
 }

@@ -1,6 +1,5 @@
 <script setup>
 const props = defineProps(["game", "player", "entry"]);
-const config = useRuntimeConfig();
 const { game, player, entry } = toRefs(props);
 const swap = useState("swap");
 
@@ -43,30 +42,40 @@ if (game.value.entries_done) {
 </script>
 
 <template>
-  <Header>Results</Header>
   <div class="box">
-    <h2>The theme:</h2>
+    <Header>Game code: {{ game.code }}</Header>
+    <ShareButton :game="game" :entry="entry" />
+
+    <div class="row">
+      <Swap v-if="swap" :swap="swap" title="Your swap is in!" />
+      <Swap v-else="swap" :swap="entry" title="Your entry" />
+
+      <Players :game="game" :swap="swap" :currentPlayer="player" />
+    </div>
+
+    <h2>Theme</h2>
     <p>{{ game.prompt }}</p>
 
-    <h3>Link to game</h3>
-    <p>{{ `${config.public.url}/game?code=${game.code}` }}</p>
-  </div>
-  <div class="box" v-if="swap">
-    <h2>Your swap:</h2>
-    <p>{{ swap.album_name }} by {{ swap.artist_name }}</p>
-    <p>Favorite track: {{ swap.song_name }}</p>
-    <p>{{ swap.comment }}</p>
-    <a :href="swap.link" target="_blank">{{ swap.link }}</a>
-  </div>
-  <div class="box">
-    <h2>Your entry:</h2>
-    <p>{{ entry.album_name }} by {{ entry.artist_name }}</p>
-    <p>Favorite track: {{ entry.song_name }}</p>
-    <p>{{ entry.comment }}</p>
-    <a :href="entry.link" target="_blank">{{ entry.link }}</a>
-  </div>
+    <Swap v-if="swap" :swap="entry" title="Your entry" />
 
-  <div class="box" v-if="game.creator === player.name">
-    <button @click="advanceGame">Start swap!</button>
+    <div class="box" v-if="game.creator === player.name">
+      <p>Creator only: *that's you*</p>
+      <button @click="advanceGame">Start swap!</button>
+    </div>
   </div>
 </template>
+
+<style scoped>
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+}
+</style>
