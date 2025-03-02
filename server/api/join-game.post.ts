@@ -39,14 +39,15 @@ export default defineEventHandler(async (event) => {
     args: [code],
   });
   const gamePlayers = gamePlayerResults.rows;
-  console.log('gamePlayers', gamePlayers);
 
   if (gamePlayers.find(player => player.name === name)) {
-    return {
+    throw createError({
       status: 409,
-      player: gamePlayers.find(player => player.name === name),
-      message: 'Name already taken',
-    };
+      data: {
+        player: gamePlayers.find(player => player.name === name),
+        message: 'Name already taken',
+      },
+    });
   }
 
   const player = await client.execute({

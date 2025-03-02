@@ -12,3 +12,9 @@ const { swap, title } = toRefs(props);
     <a :href="swap.link" target="_blank">{{ swap.link }}</a>
   </div>
 </template>
+
+<style scoped>
+div {
+  max-width: 600px;
+}
+</style>

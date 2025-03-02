@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps(["handleSubmit", "name"]);
+const props = defineProps(["handleSubmit"]);
 </script>
 
 <template>

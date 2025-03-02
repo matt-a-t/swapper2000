@@ -12,5 +12,5 @@ function copyLink() {
 </script>
 <template>
   <button @click="copyLink">Share Game</button>
-  <span v-if="copied">Copied! Go paste it somewhere!</span>
+  <span v-if="copied">Copied!</span>
 </template>

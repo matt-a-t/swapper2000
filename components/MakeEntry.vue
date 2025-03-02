@@ -1,5 +1,6 @@
 <script setup>
-const props = defineProps(["game", "player", "setEntry"]);
+const props = defineProps(["game", "player"]);
+const emit = defineEmits(["refreshGame"]);
 
 async function handleSubmit(event) {
   console.log("submitting");
@@ -23,7 +24,7 @@ async function handleSubmit(event) {
     throw new Error("Network response was not ok.");
   }
 
-  props.setEntry(response.entry);
+  emit("refreshGame");
 }
 </script>
 

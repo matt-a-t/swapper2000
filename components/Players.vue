@@ -1,23 +1,24 @@
 <script setup>
 const props = defineProps(["game", "currentPlayer", "swap"]);
+const emit = defineEmits(["refreshGame"]);
 const { game, currentPlayer, swap } = toRefs(props);
 
 async function guess(guessedPlayer) {
-  console.log(currentPlayer);
-  const response = await $fetch("api/guess", {
+  await $fetch("api/guess", {
     method: "POST",
     body: {
       gameCode: game.value.code,
       playerId: currentPlayer.value.id,
       guessedId: guessedPlayer.id,
     },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok.");
-  }
-
-  navigateTo("/results?code=" + game.value.code + "&player=" + player.id);
+  })
+    .then(() => {
+      emit("refreshGame");
+    })
+    .catch((error) => {
+      console.error(error.data);
+      alert("Something fucky happened...");
+    });
 }
 </script>
 
@@ -43,6 +44,7 @@ async function guess(guessedPlayer) {
       <li v-for="player in game.players" :key="player.id" class="col">
         <img src="/Cat Player Logo.png" alt="" />
         {{ player.name }}
+        <span v-if="player.id == swap?.player_guess_id">Guessed</span>
       </li>
     </ul>
   </div>

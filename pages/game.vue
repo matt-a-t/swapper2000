@@ -1,126 +1,130 @@
 <script setup>
 const config = useRuntimeConfig();
-const route = useRoute();
-const gameCode = ref(route.query.code);
-const game = useState("game");
-const name = ref(route.query.name);
-const player = useState("player");
-const entry = useState("entry");
+const { code: queryCode, name: queryName } = useRoute().query;
 
-// if we get the code from the URL, fetch the game
-if (gameCode.value) {
-  await fetchGame();
-}
+const code = ref(queryCode);
+const name = ref(queryName);
 
-if (game.value && name.value) {
-  await joinGame();
-}
+const joined = ref(false);
 
-// fetch the game status and set state
-async function fetchGame() {
-  const response = await $fetch(`${config.public.url}/api/game`, {
-    method: "GET",
-    query: {
-      code: gameCode.value,
-    },
-  });
-  if (!response.ok) {
-    throw new Error("Network response was not ok.");
-  }
-  if (!!response.game) {
-    game.value = response.game;
-  }
-}
+const { data: game, refresh } = await useAsyncData(`game:${code.value}`, () =>
+  fetchGame(code.value)
+);
 
-async function fetchEntry() {
-  const response = await $fetch(`${config.public.url}/api/entry`, {
-    method: "GET",
-    query: {
-      code: gameCode.value,
-      playerid: player.value.id,
-    },
-  });
-  if (!response.ok && response.status !== 404) {
-    throw new Error("Network response was not ok.");
+const player = computed(() =>
+  game.value?.players.find((p) => p.name === name.value)
+);
+const entry = computed(() =>
+  game.value?.entries.find((e) => e.player_id === player.value?.id)
+);
+const swap = computed(() => {
+  if (!game.value?.entries_done) {
+    return null;
   }
-  if (!!response.entry) {
-    entry.value = response.entry;
-  }
-}
+  const swapInfo =
+    game.value?.swaps.find((s) => s.to_player_id === player.value?.id) || {};
+  const swapEntry =
+    game.value?.entries.find((e) => e.player_id === swapInfo.from_player_id) ||
+    {};
+
+  return {
+    ...swapInfo,
+    ...swapEntry,
+  };
+});
 
 async function handleGamecodeSubmit(event) {
   const form = event.target;
   const formData = new FormData(form);
-  gameCode.value = formData.get("game-code");
-  fetchGame();
+  code.value = formData.get("game-code");
+  navigateTo(`/game?code=${code.value}`);
+  await refresh();
 }
 
 async function handleNameSubmit(event) {
   const form = event.target;
   const formData = new FormData(form);
-  const nameToUse = formData.get("name");
-  name.value = nameToUse;
+  name.value = formData.get("name");
+
+  navigateTo(`/game?code=${code.value}&name=${name.value}`);
 
   joinGame();
 }
 
 // join the game with proivded name
 async function joinGame() {
-  const response = await $fetch(`${config.public.url}/api/join-game`, {
+  await $fetch(`${config.public.url}/api/join-game`, {
     method: "POST",
     body: {
-      code: gameCode.value,
+      code: code.value,
       name: name.value,
     },
-  });
-  if (!response.ok) {
-    if (response.status === 409) {
-      window != undefined &&
-      confirm(`${name.value} is already in the game. Is that you?`)
-        ? setPlayer(response.player)
-        : null;
-    } else {
-      console.error(response);
-      alert("Something fucky happened...");
-    }
-  }
+  })
+    .then(() => {
+      joined.value = true;
+    })
+    .catch((error) => {
+      if (error.data.statusCode === 409) {
+        window != undefined &&
+        confirm(`${name.value} is already in the game. Is that you?`)
+          ? (joined.value = true)
+          : null;
+      } else {
+        console.error(error);
+        alert("Something fucky happened...");
+      }
+    });
 
-  setPlayer(response.player);
+  await refresh();
 }
 
-// set the entry for the player
-function setEntry(entry) {
-  fetchEntry();
-  entry.value = entry;
-  fetchGame();
-}
-
-async function setPlayer(newPlayer) {
-  player.value = newPlayer;
-  await nextTick();
-  fetchEntry();
+if (name.value && code.value && !joined.value) {
+  joinGame();
 }
 </script>
 
 <template>
   <main>
     <FindGame v-if="!game" :handleSubmit="handleGamecodeSubmit" />
+    <div class="box" v-else>
+      <!-- <Players
+        :game="game"
+        :currentPlayer="player"
+        :swap="swap"
+      /> -->
+      <h2>Game code: {{ game.code }}</h2>
+      <ShareButton :game="game" :entry="entry" />
+    </div>
+    <div class="box" v-if="swap">
+      <Swap v-if="swap" :swap="swap" title="Your swap is in!" />
+    </div>
+    <Players
+      v-if="game"
+      :game="game"
+      :currentPlayer="player"
+      :swap="swap"
+      v-on:refresh-game="refresh"
+    />
+
     <PickName
-      v-if="game && !player"
+      v-if="game && !name"
       :handleSubmit="handleNameSubmit"
       :name="name"
     />
     <MakeEntry
-      v-if="game && player && !entry"
+      v-if="game && joined && !entry"
       :game="game"
       :player="player"
-      :setEntry="setEntry"
+      v-on:refresh-game="refresh"
     />
     <Results
-      v-if="game && player && entry"
+      v-if="game && joined && entry"
       :game="game"
       :player="player"
       :entry="entry"
+      :swap="swap"
+      v-on:refresh-game="refresh"
     />
+    <!-- {{ game }} -->
   </main>
 </template>

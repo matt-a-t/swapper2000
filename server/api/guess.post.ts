@@ -11,12 +11,12 @@ export default defineEventHandler(async (event) => {
   console.log('posting guess');
   const result = await readValidatedBody(event, body => guessSchema.safeParse(body));
   if (!result.success) {
-    return {
+    return createError({
       status: 400,
       data: {
         error: result.error,
       },
-    };
+    })
   }
 
   const { gameCode, guessedId, playerId } = result.data;
@@ -30,6 +30,6 @@ export default defineEventHandler(async (event) => {
   await client.execute({ sql, args });
 
   return {
-    success: true,
+    ok: true,
   };
 });

@@ -1,7 +1,12 @@
 <script setup>
-const props = defineProps(["game", "player", "entry"]);
-const { game, player, entry } = toRefs(props);
-const swap = useState("swap");
+const props = defineProps({
+  game: Object,
+  player: Object,
+  entry: Object,
+  swap: Object,
+});
+const emit = defineEmits(["refreshGame"]);
+const { game, player, entry, swap, refreshGame } = toRefs(props);
 
 async function advanceGame() {
   const response = await $fetch("api/swap", {
@@ -15,42 +20,15 @@ async function advanceGame() {
     throw new Error("Network response was not ok.");
   }
 
-  navigateTo("/game?code=" + game.value.code + "&name=" + player.value.name);
-}
-
-async function getSwap() {
-  const response = await $fetch("api/swap", {
-    method: "GET",
-    query: {
-      gameCode: game.value.code,
-      playerId: player.value.id,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok.");
-  }
-
-  if (response.swap) {
-    swap.value = response.swap;
-  }
-}
-
-if (game.value.entries_done) {
-  getSwap();
+  emit("refreshGame");
 }
 </script>
 
 <template>
   <div class="box">
-    <Header>Game code: {{ game.code }}</Header>
-    <ShareButton :game="game" :entry="entry" />
-
     <div class="row">
       <Swap v-if="swap" :swap="swap" title="Your swap is in!" />
-      <Swap v-else="swap" :swap="entry" title="Your entry" />
-
-      <Players :game="game" :swap="swap" :currentPlayer="player" />
+      <Swap v-else :swap="entry" title="Your entry" />
     </div>
 
     <h2>Theme</h2>
