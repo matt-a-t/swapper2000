@@ -14,24 +14,8 @@ const { data: game, refresh } = await useAsyncData(`game:${code.value}`, () =>
 const player = computed(() =>
   game.value?.players.find((p) => p.name === name.value)
 );
-const entry = computed(() =>
-  game.value?.entries.find((e) => e.player_id === player.value?.id)
-);
-const swap = computed(() => {
-  if (!game.value?.entries_done) {
-    return null;
-  }
-  const swapInfo =
-    game.value?.swaps.find((s) => s.to_player_id === player.value?.id) || {};
-  const swapEntry =
-    game.value?.entries.find((e) => e.player_id === swapInfo.from_player_id) ||
-    {};
-
-  return {
-    ...swapInfo,
-    ...swapEntry,
-  };
-});
+const entry = computed(() => player.value?.entry);
+const swap = computed(() => player.value?.swap);
 
 async function handleGamecodeSubmit(event) {
   const form = event.target;
@@ -81,27 +65,32 @@ async function joinGame() {
 if (name.value && code.value && !joined.value) {
   joinGame();
 }
+
+async function advanceGame() {
+  const response = await $fetch("api/swap", {
+    method: "POST",
+    body: {
+      gameCode: game.value.code,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok.");
+  }
+
+  refresh();
+}
 </script>
 
 <template>
   <main>
     <FindGame v-if="!game" :handleSubmit="handleGamecodeSubmit" />
-    <div class="box" v-else>
-      <!-- <Players
-        :game="game"
-        :currentPlayer="player"
-        :swap="swap"
-      /> -->
-      <h2>Game code: {{ game.code }}</h2>
-      <ShareButton :game="game" :entry="entry" />
-    </div>
-    <div class="box" v-if="swap">
-      <Swap v-if="swap" :swap="swap" title="Your swap is in!" />
-    </div>
-    <Players
-      v-if="game"
+
+    <Results
+      v-if="game && joined && entry"
       :game="game"
-      :currentPlayer="player"
+      :player="player"
+      :entry="entry"
       :swap="swap"
       v-on:refresh-game="refresh"
     />
@@ -117,14 +106,40 @@ if (name.value && code.value && !joined.value) {
       :player="player"
       v-on:refresh-game="refresh"
     />
-    <Results
-      v-if="game && joined && entry"
+    <Players
       :game="game"
-      :player="player"
-      :entry="entry"
+      :currentPlayer="player"
       :swap="swap"
       v-on:refresh-game="refresh"
     />
+
+    <div class="box" v-if="game">
+      <div class="row">
+        <div>
+          <h2>Theme</h2>
+          <p>{{ game.prompt }}</p>
+        </div>
+        <div class="right">
+          <h3>Code</h3>
+          <p>{{ game.code }}</p>
+        </div>
+      </div>
+      <ShareButton :game="game" :entry="entry" />
+    </div>
+
+    <div class="box" v-if="game && player && game?.creator === player?.name">
+      <p>Creator only: *that's you*</p>
+      <button @click="advanceGame" v-if="!game?.entries_done">
+        Start swap!
+      </button>
+    </div>
     <!-- {{ game }} -->
   </main>
 </template>
+
+<style scoped>
+.row {
+  line-height: 1;
+  justify-content: space-between;
+}
+</style>

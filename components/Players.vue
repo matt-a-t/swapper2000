@@ -43,8 +43,11 @@ async function guess(guessedPlayer) {
     <ul class="wrap">
       <li v-for="player in game.players" :key="player.id" class="col">
         <img src="/Cat Player Logo.png" alt="" />
-        {{ player.name }}
+        {{ player.id == currentPlayer?.id ? "You" : player.name }}
         <span v-if="player.id == swap?.player_guess_id">Guessed</span>
+        <span v-if="game.entries.find((p) => p.player_id === player.id)">
+          Swap submitted
+        </span>
       </li>
     </ul>
   </div>

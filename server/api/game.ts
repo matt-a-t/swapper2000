@@ -61,12 +61,35 @@ export default defineEventHandler(async (event) => {
     args: [game.code],
   });
 
+  const players = playersQuery.rows.map((player) => {
+    const swap = swapsQuery.rows.find((swap) => swap.to_player_id === player.id);
+    const entry = entriesQuery.rows.find((entry) => entry.player_id === player.id);
+
+    if (!swap) {
+      return {
+        ...player,
+        entry
+      }
+    }
+
+    const swapEntry = entriesQuery.rows.find((entry) => entry.player_id === swap.from_player_id);
+    return {
+      ...player,
+      entry,
+      swap: {
+        ...swap,
+        ...swapEntry
+      }
+    }
+  });
+
+
   return {
     ok: true,
     game: {
       ...game,
+      players,
       entries: entriesQuery.rows,
-      players: playersQuery.rows,
       swaps: swapsQuery.rows,
     },
   };
