@@ -7,22 +7,10 @@
 </template>
 
 <style>
-/* main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  @media (max-width: 600px) {
-    gap: 4em;
-  }
-} */
-
 .garf {
   height: 60%;
   @media (max-width: 600px) {
     height: 40%;
   }
-  /* max-width: 400px; */
 }
 </style>
