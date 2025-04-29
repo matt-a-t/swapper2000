@@ -34,11 +34,49 @@
   height: 100vh;
   width: 100vw;
   position: absolute;
+  animation: fish 20s linear infinite;
+}
+
+@keyframes fish {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: 100px 100px;
+  }
+  50% {
+    background-position: -100px -100px;
+  }
+  75% {
+    background-position: 100px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
 }
 
 .fish-2 {
   background-position: 35px 60px;
   opacity: 0.7;
+  animation: fish-2 20s linear infinite;
+}
+
+@keyframes fish-2 {
+  0% {
+    background-position: 35px 60px;
+  }
+  15% {
+    background-position: 135px 160px;
+  }
+  50% {
+    background-position: -65px -40px;
+  }
+  85% {
+    background-position: 135px 60px;
+  }
+  100% {
+    background-position: 35px 60px;
+  }
 }
 
 #container {
