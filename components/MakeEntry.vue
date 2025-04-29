@@ -48,7 +48,7 @@ async function handleSubmit(event) {
     <input id="link" name="link" type="text" />
 
     <label for="comment">Comment</label>
-    <input id="comment" name="comment" type="textarea" />
+    <textarea id="comment" name="comment" type="text" />
 
     <input type="submit" value="SWAP!" />
   </form>

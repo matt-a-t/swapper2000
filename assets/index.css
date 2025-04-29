@@ -65,13 +65,14 @@ label {
 }
 
 input[type="text"],
-input[type="textarea"] {
+textarea {
   font-size: 1.5em;
   padding: 0.5em;
 }
 
-input[type="textarea"] {
+textarea {
   height: 10em;
+  resize: both;
 }
 
 .radio-group {
