@@ -65,9 +65,13 @@ label {
 }
 
 input[type="text"],
-textarea {
+input[type="textarea"] {
   font-size: 1.5em;
   padding: 0.5em;
+}
+
+input[type="textarea"] {
+  height: 10em;
 }
 
 .radio-group {
